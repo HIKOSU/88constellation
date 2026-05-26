@@ -19,7 +19,7 @@
     }
     .container {
       background-color: #1b263b;
-      max-width: 600px;
+      max-width: 650px;
       width: 100%;
       margin: 20px;
       padding: 30px;
@@ -47,7 +47,7 @@
       margin-top: 10px;
       margin-bottom: 10px;
       transition: background-color 0.3s;
-      width: 80%; /* ボタンのサイズを揃える */
+      width: 80%;
       max-width: 300px;
     }
     button:hover { background-color: #778da9; }
@@ -63,7 +63,7 @@
       max-height: 300px;
       border-radius: 8px;
       margin-bottom: 20px;
-      background-color: #000; /* 透過png対策 */
+      background-color: #000;
     }
 
     .options-group {
@@ -106,18 +106,45 @@
       text-align: left;
       list-style-type: none;
       padding: 0;
-      max-height: 400px;
+      max-height: 500px;
       overflow-y: auto;
     }
     .review-item {
       background-color: #2c3e50;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
       padding: 15px;
       border-radius: 8px;
       border-left: 5px solid #e63946;
     }
     .correct-text { color: #a8dadc; font-weight: bold; }
     .wrong-text { color: #e63946; font-weight: bold; }
+
+    /* 【新設】復習用画像並び替えスタイル */
+    .review-images {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .review-img-box {
+      flex: 1;
+      min-width: 140px;
+      background-color: #000;
+      padding: 8px;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .review-img-box img {
+      max-width: 100%;
+      height: auto;
+      max-height: 120px;
+      display: block;
+      margin: 0 auto 5px auto;
+    }
+    .review-img-caption {
+      font-size: 0.8em;
+      color: #b0c4de;
+    }
   </style>
 </head>
 <body>
@@ -264,9 +291,8 @@
     let currentQuestionIndex = 0;
     let score = 0;
     let wrongAnswers = [];
-    let currentMode = "nameAndArea"; // 'nameOnly' または 'nameAndArea'
+    let currentMode = "nameAndArea";
 
-    // 配列をシャッフルする関数
     function shuffleArray(array) {
       const arr = [...array];
       for (let i = arr.length - 1; i > 0; i--) {
@@ -276,21 +302,18 @@
       return arr;
     }
 
-    // 画面の切り替え関数
     function showScreen(screenId) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(screenId).classList.add('active');
     }
 
-    // クイズの開始
     function startQuiz(mode) {
-      currentMode = mode; // モードを保存
+      currentMode = mode;
       quizList = shuffleArray(constellations).slice(0, TOTAL_QUESTIONS);
       currentQuestionIndex = 0;
       score = 0;
       wrongAnswers = [];
 
-      // モードに合わせてエリア選択肢の表示/非表示を切り替え
       const areaGroup = document.getElementById('area-group');
       if (currentMode === 'nameOnly') {
         areaGroup.style.display = 'none';
@@ -302,19 +325,16 @@
       loadQuestion();
     }
 
-    // 問題の読み込みと表示
     function loadQuestion() {
       const currentQ = quizList[currentQuestionIndex];
       document.getElementById('question-counter').textContent = `第 ${currentQuestionIndex + 1} / ${TOTAL_QUESTIONS} 問`;
 
-      // 画像パスの生成
       const imageName = currentQ.name.replace(/座$/, '');
       document.getElementById('constellation-image').src = `${imageName}.png`;
       document.getElementById('constellation-image').onerror = function() {
         this.alt = `画像が見つかりません: ${imageName}.png`;
       };
 
-      // --- 名前の4択を生成 ---
       const otherNames = constellations
         .map(c => c.name)
         .filter(name => name !== currentQ.name);
@@ -333,7 +353,6 @@
         nameOptionsContainer.appendChild(label);
       });
 
-      // --- エリアの6択を生成 (固定順、nameAndAreaモードの時のみ中身をセット) ---
       if (currentMode === 'nameAndArea') {
         const areaChoices = ALL_AREAS; 
         const areaOptionsContainer = document.getElementById('area-options');
@@ -350,12 +369,10 @@
       }
     }
 
-    // 回答ボタンを押したときの処理
     function submitAnswer() {
       const selectedName = document.querySelector('input[name="name-choice"]:checked');
       const selectedArea = document.querySelector('input[name="area-choice"]:checked');
 
-      // モード別の必須チェック
       if (currentMode === 'nameOnly') {
         if (!selectedName) {
           alert("「名前」を選んでください。");
@@ -370,13 +387,11 @@
 
       const currentQ = quizList[currentQuestionIndex];
       const isNameCorrect = (selectedName.value === currentQ.name);
-      // 名前だけモードならエリアは自動的にtrue扱いにする
       const isAreaCorrect = (currentMode === 'nameOnly') ? true : (selectedArea.value === currentQ.area);
 
       if (isNameCorrect && isAreaCorrect) {
         score++;
       } else {
-        // 間違えた問題を復習用に保存
         wrongAnswers.push({
           questionNum: currentQuestionIndex + 1,
           correctName: currentQ.name,
@@ -396,12 +411,10 @@
       }
     }
 
-    // リザルト画面の表示
     function showResult() {
       showScreen('result-screen');
       document.getElementById('score-display').textContent = `${TOTAL_QUESTIONS}問中 ${score}問 正解！`;
 
-      // モードに合わせて結果画面の注釈を変更
       const conditionNote = document.getElementById('condition-note');
       if (currentMode === 'nameOnly') {
         conditionNote.textContent = " ";
@@ -428,13 +441,38 @@
             <div>名前: ${nameResultText}</div>
           `;
 
-          // 名前とエリアあてモードの時だけエリアの復習も表示
           if (currentMode === 'nameAndArea') {
             const areaResultText = wrong.isAreaCorrect 
               ? `<span class="correct-text">〇 ${wrong.userArea}</span>`
               : `<span class="wrong-text">× ${wrong.userArea}</span> (正解: ${wrong.correctArea})`;
             reviewHTML += `<div>エリア: ${areaResultText}</div>`;
           }
+
+          // --- 【追加】画像の比較エリアを生成 ---
+          const correctImageFile = wrong.correctName.replace(/座$/, '') + '.png';
+          const userImageFile = wrong.userName.replace(/座$/, '') + '.png';
+
+          reviewHTML += `<div class="review-images">`;
+          
+          // 正解の画像（常に表示）
+          reviewHTML += `
+            <div class="review-img-box">
+              <img src="${correctImageFile}" alt="${wrong.correctName}">
+              <div class="review-img-caption">正解: ${wrong.correctName}</div>
+            </div>
+          `;
+
+          // 選んだ間違いの画像（名前が間違っていて、かつ選んだ選択肢が有効なときのみ表示）
+          if (!wrong.isNameCorrect && wrong.userName !== "未選択") {
+            reviewHTML += `
+              <div class="review-img-box">
+                <img src="${userImageFile}" alt="${wrong.userName}">
+                <div class="review-img-caption">あなたが選んだ: ${wrong.userName}</div>
+              </div>
+            `;
+          }
+          
+          reviewHTML += `</div>`; // .review-images 終了
 
           li.innerHTML = reviewHTML;
           reviewList.appendChild(li);
