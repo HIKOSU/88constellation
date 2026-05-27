@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>88星座マスタークイズ</title>
+  <title>88星座クイズ</title>
   <style>
-    /* 全体のスタイル */
+    /* 恥ずかしいからコード見ないで */
     body {
       font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
       background-color: #0d1b2a;
@@ -30,12 +30,10 @@
     h1, h2, h3 {
       color: #e0e1dd;
     }
-    
-    /* 画面の切り替え用 */
+  
     .screen { display: none; }
     .screen.active { display: block; }
 
-    /* ボタンと選択肢のスタイル */
     button {
       background-color: #415a77;
       color: white;
@@ -82,7 +80,6 @@
       gap: 10px;
     }
     
-    /* ラジオボタンを押しやすいボタン風に */
     .option-label {
       display: block;
       background-color: #415a77;
@@ -101,7 +98,6 @@
       font-weight: bold;
     }
 
-    /* リザルト画面のスタイル */
     .review-list {
       text-align: left;
       list-style-type: none;
@@ -119,7 +115,6 @@
     .correct-text { color: #a8dadc; font-weight: bold; }
     .wrong-text { color: #e63946; font-weight: bold; }
 
-    /* 【新設】復習用画像並び替えスタイル */
     .review-images {
       display: flex;
       gap: 15px;
@@ -152,10 +147,10 @@
   <div class="container">
     <div id="start-screen" class="screen active">
       <h1>88星座マスタークイズ</h1>
-      <p>星座の画像を見てクイズに挑戦しよう！全20問です。</p>
+      <p>クイズで88星座を覚えよう。</p>
       <p>挑戦するモードを選んでください：</p>
       <button class="mode-btn" onclick="startQuiz('nameOnly')">星座名あてモード (4択)</button><br>
-      <button class="mode-btn" onclick="startQuiz('nameAndArea')">星座名＋エリアあてモード</button>
+      <button class="mode-btn" onclick="startQuiz('nameAndArea')">星座名＋エリアあてモード(4+6択)</button>
     </div>
 
     <div id="quiz-screen" class="screen">
@@ -165,12 +160,12 @@
       </div>
       
       <div id="name-group" class="options-group">
-        <div class="options-title">1. 星座の名前を選んでください（4択）</div>
+        <div class="options-title">1. 星座の名前を選んでください</div>
         <div id="name-options" class="options-grid"></div>
       </div>
 
       <div id="area-group" class="options-group">
-        <div class="options-title">2. エリアを選んでください（6択）</div>
+        <div class="options-title">2. エリアを選んでください</div>
         <div id="area-options" class="options-grid"></div>
       </div>
 
@@ -192,7 +187,7 @@
   </div>
 
   <script>
-    // 星座データ
+
     const constellations = [
       { id: 1, name: "アンドロメダ座", area: "秋" },
       { id: 2, name: "いっかくじゅう座", area: "冬" },
@@ -448,21 +443,18 @@
             reviewHTML += `<div>エリア: ${areaResultText}</div>`;
           }
 
-          // --- 【追加】画像の比較エリアを生成 ---
           const correctImageFile = wrong.correctName.replace(/座$/, '') + '.png';
           const userImageFile = wrong.userName.replace(/座$/, '') + '.png';
 
           reviewHTML += `<div class="review-images">`;
           
-          // 正解の画像（常に表示）
           reviewHTML += `
             <div class="review-img-box">
               <img src="${correctImageFile}" alt="${wrong.correctName}">
               <div class="review-img-caption">正解: ${wrong.correctName}</div>
             </div>
           `;
-
-          // 選んだ間違いの画像（名前が間違っていて、かつ選んだ選択肢が有効なときのみ表示）
+          
           if (!wrong.isNameCorrect && wrong.userName !== "未選択") {
             reviewHTML += `
               <div class="review-img-box">
